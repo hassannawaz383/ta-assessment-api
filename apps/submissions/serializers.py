@@ -46,3 +46,69 @@ class SubmissionCreateSerializer(serializers.ModelSerializer):
             )
 
         return value
+    from apps.reviews.models import Review
+
+
+class SubmissionListSerializer(
+    serializers.ModelSerializer
+):
+
+    candidate_name = serializers.CharField(
+        source="candidate.name",
+        read_only=True
+    )
+
+    candidate_email = serializers.CharField(
+        source="candidate.email",
+        read_only=True
+    )
+
+    city = serializers.CharField(
+        source="candidate.city",
+        read_only=True
+    )
+
+    role = serializers.CharField(
+        source="assessment.role",
+        read_only=True
+    )
+
+    score = serializers.SerializerMethodField()
+
+    decision = serializers.SerializerMethodField()
+
+    class Meta:
+
+        model = Submission
+
+        fields = [
+            "id",
+            "candidate_name",
+            "candidate_email",
+            "city",
+            "role",
+            "status",
+            "score",
+            "decision",
+            "submitted_at",
+        ]
+
+    def get_score(
+        self,
+        obj
+    ):
+
+        if hasattr(obj, "review"):
+            return obj.review.score
+
+        return None
+
+    def get_decision(
+        self,
+        obj
+    ):
+
+        if hasattr(obj, "review"):
+            return obj.review.decision
+
+        return None
