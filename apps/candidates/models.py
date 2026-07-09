@@ -35,5 +35,9 @@ class Candidate(models.Model):
             models.Index(fields=["city"]),
         ]
 
+    @property
+    def is_authenticated(self):
+        return True
+
     def __str__(self):
         return self.email
