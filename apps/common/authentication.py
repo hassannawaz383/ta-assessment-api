@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 
@@ -8,7 +9,9 @@ class CandidateTokenAuthentication(BaseAuthentication):
 
     def authenticate(self, request):
 
-        token = request.headers.get("X-Candidate-Token")
+        token = request.headers.get(
+            "X-Candidate-Token"
+        )
 
         if not token:
             return None
@@ -18,9 +21,16 @@ class CandidateTokenAuthentication(BaseAuthentication):
                 private_token=token
             )
 
-        except Candidate.DoesNotExist:
+        except (
+            Candidate.DoesNotExist,
+            ValidationError,
+            ValueError,
+        ):
             raise AuthenticationFailed(
                 "Invalid candidate token."
             )
 
-        return (candidate, None)
+        return (
+            candidate,
+            None
+        )
